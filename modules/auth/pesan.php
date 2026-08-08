@@ -2,12 +2,18 @@
 $page_title = 'Informasi';
 $hide_page_title = true;
 $pdo = db();
-$admin = $pdo->query("SELECT u.no_hp FROM users u
+$admin_hp = getSetting('admin_phone', '');
+if ($admin_hp === '') {
+    $admin_hp = getSetting('contact_phone', '');
+}
+if ($admin_hp === '') {
+    $admin = $pdo->query("SELECT u.no_hp FROM users u
                         JOIN user_roles ur ON ur.user_id = u.id
                         JOIN roles r ON r.id = ur.role_id
                         WHERE r.name = 'admin' AND u.no_hp IS NOT NULL AND u.no_hp <> ''
                         LIMIT 1")->fetch();
-$admin_hp = $admin ? $admin['no_hp'] : '0823-7278-9123';
+    $admin_hp = $admin ? $admin['no_hp'] : '';
+}
 ?>
 <div class="container py-4">
     <div class="row justify-content-center">
