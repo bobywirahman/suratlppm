@@ -140,6 +140,22 @@ try {
             transition: .3s;
         }
         .scroll-top:hover { transform: translateY(-3px); }
+        .wa-float {
+            position: fixed; bottom: 96px; right: 24px; z-index: 998;
+            width: 56px; height: 56px; border-radius: 50%;
+            background: #25D366; color: #fff; display: flex;
+            align-items: center; justify-content: center; text-decoration: none;
+            font-size: 1.7rem; box-shadow: 0 6px 20px rgba(37,211,102,0.4);
+            transition: .3s;
+        }
+        .wa-float:hover { transform: translateY(-3px) scale(1.05); color: #fff; box-shadow: 0 10px 30px rgba(37,211,102,0.5); }
+        .wa-float .wa-tooltip {
+            position: absolute; right: calc(100% + 12px); top: 50%; transform: translateY(-50%);
+            background: #1a1a2e; color: #fff; font-size: 0.75rem; font-weight: 500;
+            padding: 6px 12px; border-radius: 8px; white-space: nowrap; opacity: 0;
+            pointer-events: none; transition: .3s;
+        }
+        .wa-float:hover .wa-tooltip { opacity: 1; }
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.2rem; }
             .hero { min-height: auto; padding: 100px 0 60px; }
@@ -395,6 +411,14 @@ try {
 </footer>
 
 <button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})"><i class="fas fa-arrow-up"></i></button>
+
+<?php $waNum = waNumber($contactPhone); ?>
+<?php if ($waNum): ?>
+<a class="wa-float" href="https://wa.me/<?php echo htmlspecialchars($waNum); ?>" target="_blank" rel="noopener" title="Chat via WhatsApp">
+    <span class="wa-tooltip">Chat dengan kami</span>
+    <i class="fab fa-whatsapp"></i>
+</a>
+<?php endif; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
