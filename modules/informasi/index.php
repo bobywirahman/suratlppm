@@ -156,7 +156,7 @@ if (document.readyState === 'loading') {
                             <?php endif; ?>
                         </td>
                         <td class="fw-bold"><?php echo htmlspecialchars($info['judul']); ?></td>
-                        <td><?php echo date('d M Y', strtotime($info['created_at'])); ?></td>
+                        <td><?php echo tanggalIndonesia($info['created_at']); ?></td>
                         <td>
                             <a href="?page=informasi-toggle&id=<?php echo $info['id']; ?>" title="Klik untuk toggle publish">
                             <?php if ($info['is_active']): ?>

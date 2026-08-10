@@ -105,7 +105,7 @@ $list = $stmt->fetchAll();
                     <img src="<?php echo htmlspecialchars(asset($info['thumbnail'])); ?>" alt="<?php echo htmlspecialchars($info['judul']); ?>">
                     <?php endif; ?>
                     <div class="info-body">
-                        <div class="info-date mb-1"><i class="far fa-calendar-alt me-1"></i><?php echo date('d M Y', strtotime($info['created_at'])); ?></div>
+                        <div class="info-date mb-1"><i class="far fa-calendar-alt me-1"></i><?php echo tanggalIndonesia($info['created_at']); ?></div>
                         <h5><?php echo htmlspecialchars($info['judul']); ?></h5>
                         <p><?php echo htmlspecialchars(mb_strimwidth(strip_tags($info['konten']), 0, 160, '...')); ?></p>
                         <div class="d-flex align-items-center justify-content-between mt-auto pt-3">

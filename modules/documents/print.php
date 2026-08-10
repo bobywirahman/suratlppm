@@ -54,8 +54,8 @@ $replacements = [
     '{judul}' => htmlspecialchars($doc['title'] ?? '-'),
     '{tipe_surat}' => htmlspecialchars($doc['type_name'] ?? '-'),
     '{deskripsi}' => nl2br(htmlspecialchars($doc['description'] ?? '-')),
-    '{tanggal}' => date('d F Y'),
-    '{tanggal_approval}' => $approvalDate ? date('d F Y', strtotime($approvalDate)) : '-',
+    '{tanggal}' => tanggalIndonesia(),
+    '{tanggal_approval}' => $approvalDate ? tanggalIndonesia($approvalDate) : '-',
     '{no_surat}' => htmlspecialchars($doc['document_number'] ?? '-'),
 ];
 // Add dynamic replacements from text-type requirements

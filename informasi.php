@@ -95,7 +95,7 @@ $latestNews = $stmt->fetchAll();
     <div class="container py-4">
         <span class="hero-badge mb-3"><i class="fas fa-bullhorn"></i> Informasi LPPM</span>
         <h1 class="info-title mt-3"><?php echo htmlspecialchars($info['judul']); ?></h1>
-        <div class="info-date"><i class="far fa-calendar-alt me-1"></i> Dipublikasikan: <?php echo date('d M Y H:i', strtotime($info['created_at'])); ?></div>
+        <div class="info-date"><i class="far fa-calendar-alt me-1"></i> Dipublikasikan: <?php echo tanggalIndonesia($info['created_at']) . ' ' . date('H:i', strtotime($info['created_at'])); ?></div>
     </div>
 </section>
 
@@ -138,7 +138,7 @@ $latestNews = $stmt->fetchAll();
                             <?php endif; ?>
                             <div>
                                 <div class="sidebar-item-title"><?php echo htmlspecialchars($n['judul']); ?></div>
-                                <div class="sidebar-item-date"><i class="far fa-calendar-alt me-1"></i><?php echo date('d M Y', strtotime($n['created_at'])); ?></div>
+                                <div class="sidebar-item-date"><i class="far fa-calendar-alt me-1"></i><?php echo tanggalIndonesia($n['created_at']); ?></div>
                             </div>
                         </a>
                         <?php endforeach; ?>
