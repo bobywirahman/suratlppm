@@ -208,7 +208,7 @@ function buildListBlock(r, existing) {
     h += '<th style="width:44px;"></th></tr></thead><tbody>';
     rows.forEach(function (rv, i) { h += listRowHtml(cols, rv, i); });
     h += '</tbody></table>';
-    h += '<button type="button" class="btn btn-sm btn-outline-primary list-add"><i class="fas fa-plus me-1"></i> Tambah Anggota</button>';
+    h += '<button type="button" class="btn btn-sm btn-outline-primary list-add"><i class="fas fa-plus me-1"></i> Tambah Data</button>';
     h += '</div>';
     return h;
 }
