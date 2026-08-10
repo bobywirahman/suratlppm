@@ -81,18 +81,18 @@ foreach ($textStmt->fetchAll() as $tr) {
                 foreach ($first as $k => $v) $cols[] = ['key' => $k, 'label' => ucwords(str_replace('_', ' ', $k))];
             }
             if (empty($cols)) $cols[] = ['key' => 'nama', 'label' => 'Nama'];
-            $tbl = '<table style="border-collapse:collapse; width:100%; margin:6px 0;">';
-            $tbl .= '<thead><tr><th style="border:1px solid #000; padding:4px 8px; text-align:center; width:30px;">No</th>';
-            foreach ($cols as $c) $tbl .= '<th style="border:1px solid #000; padding:4px 8px;">' . htmlspecialchars($c['label']) . '</th>';
+            $tbl = '<table style="border-collapse:collapse; width:100%; margin:2px 0; line-height:1;">';
+            $tbl .= '<thead><tr><th style="border:1px solid #000; padding:2px 6px; text-align:center; width:30px; line-height:1;">No</th>';
+            foreach ($cols as $c) $tbl .= '<th style="border:1px solid #000; padding:2px 6px; line-height:1;">' . htmlspecialchars($c['label']) . '</th>';
             $tbl .= '</tr></thead><tbody>';
             $no = 0;
             foreach ($decoded as $li) {
                 $li = is_array($li) ? $li : [];
                 $no++;
-                $tbl .= '<tr><td style="border:1px solid #000; padding:4px 8px; text-align:center;">' . $no . '</td>';
+                $tbl .= '<tr><td style="border:1px solid #000; padding:2px 6px; text-align:center; line-height:1;">' . $no . '</td>';
                 foreach ($cols as $c) {
                     $val = isset($li[$c['key']]) ? trim((string)$li[$c['key']]) : '';
-                    $tbl .= '<td style="border:1px solid #000; padding:4px 8px;">' . htmlspecialchars($val) . '</td>';
+                    $tbl .= '<td style="border:1px solid #000; padding:2px 6px; line-height:1;">' . htmlspecialchars($val) . '</td>';
                 }
                 $tbl .= '</tr>';
             }
@@ -123,16 +123,16 @@ if (empty(trim(strip_tags($body)))) {
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { font-family: 'Times New Roman', Times, serif; }
-        body { padding: 5px 60px; background: #fff; font-size: 12pt; line-height: 1.6; }
+        body { padding: 2px 60px; background: #fff; font-size: 12pt; line-height: 1.6; }
         img { max-width: 100%; height: auto; }
         img.img-full-bleed { margin-left: -60px; margin-right: -60px; width: calc(100% + 120px); max-width: none; }
         @page {
             size: A4;
-            margin: 10mm 10mm 12mm 10mm;
+            margin: 5mm 10mm 12mm 10mm;
         }
         @media print {
             .no-print { display: none !important; }
-            body { padding: 5px 60px; }
+            body { padding: 2px 60px; }
         }
     </style>
 </head>
