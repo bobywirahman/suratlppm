@@ -41,7 +41,7 @@ function initInfoEditor() {
             plugins: 'advlist autolink lists link image charmap preview anchor searchreplace visualblocks code fullscreen insertdatetime media table code help wordcount',
             toolbar: 'undo redo | formatselect fontselect fontsizeselect | bold italic underline strikethrough subscript superscript | forecolor backcolor | alignleft aligncenter alignright | bullist numlist | table | image link | removeformat | code fullscreen',
             font_formats: 'Arial=arial,helvetica,sans-serif; Courier New=courier new,courier,monospace; Georgia=georgia,times new roman,serif; Tahoma=tahoma,geneva,sans-serif; Times New Roman=times new roman,times,serif; Verdana=verdana,geneva,sans-serif; Calibri=calibri,sans-serif; Cambria=cambria,serif; Garamond=garamond,serif; Comic Sans MS=comic sans ms,sans-serif; Trebuchet MS=trebuchet ms,geneva,sans-serif',
-            fontsize_formats: '8 9 10 11 12 13 14 16 18 20 22 24 26 28 36 42 48 60 72',
+            fontsize_formats: '8pt 9pt 10pt 11pt 12pt 13pt 14pt 16pt 18pt 20pt 22pt 24pt 26pt 28pt 36pt 42pt 48pt 60pt 72pt',
             content_style: 'body { font-family: "Inter", sans-serif; font-size: 14px; line-height: 1.8; }',
             setup: function (editor) {
                 editor.on('change', function () { editor.save(); });

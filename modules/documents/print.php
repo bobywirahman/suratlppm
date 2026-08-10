@@ -126,6 +126,10 @@ if (empty(trim(strip_tags($body)))) {
         body { padding: 5px 60px; background: #fff; font-size: 12pt; line-height: 1.6; }
         img { max-width: 100%; height: auto; }
         img.img-full-bleed { margin-left: -60px; margin-right: -60px; width: calc(100% + 120px); max-width: none; }
+        @page {
+            size: A4;
+            margin: 10mm 10mm 12mm 10mm;
+        }
         @media print {
             .no-print { display: none !important; }
             body { padding: 5px 60px; }
