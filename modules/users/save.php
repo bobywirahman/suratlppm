@@ -1,6 +1,15 @@
 <?php
 $pdo = db();
 $id = $_POST['id'] ?? null;
+
+// Kembali ke daftar sesuai pencarian/pagination sebelumnya (hanya izinkan key valid)
+$back = $_POST['back'] ?? '';
+if ($back !== '') {
+    parse_str($back, $backParts);
+    if (!empty(array_diff(array_keys($backParts), ['q', 'per_page', 'p']))) $back = '';
+    $back = preg_replace('/[^a-zA-Z0-9_%&=+ ]/', '', $back);
+}
+$redirect = '?page=users' . ($back !== '' ? '&' . $back : '');
 $full_name = trim($_POST['full_name'] ?? '');
 $username = trim($_POST['username'] ?? '') ?: null;
 $nip = trim($_POST['nip'] ?? '') ?: null;
@@ -15,7 +24,7 @@ $is_active = isset($_POST['is_active']) ? 1 : 0;
 
 if (empty($full_name) || empty($email)) {
     $_SESSION['error'] = "Nama dan email wajib diisi";
-    header("Location: ?page=users");
+    header("Location: " . $redirect);
     exit;
 }
 
@@ -24,7 +33,7 @@ $valid->execute([$role]);
 $roleRow = $valid->fetch();
 if (!$roleRow) {
     $_SESSION['error'] = "Role tidak valid";
-    header("Location: ?page=users");
+    header("Location: " . $redirect);
     exit;
 }
 $role_id = $roleRow['id'];
@@ -33,7 +42,7 @@ $check = $pdo->prepare("SELECT id FROM users WHERE email = ? AND id != ?");
 $check->execute([$email, $id ?? 0]);
 if ($check->fetch()) {
     $_SESSION['error'] = "Email sudah digunakan";
-    header("Location: ?page=users");
+    header("Location: " . $redirect);
     exit;
 }
 
@@ -42,7 +51,7 @@ if ($username) {
     $check->execute([$username, $id ?? 0]);
     if ($check->fetch()) {
         $_SESSION['error'] = "Username sudah digunakan";
-        header("Location: ?page=users");
+        header("Location: " . $redirect);
         exit;
     }
 }
@@ -68,5 +77,5 @@ if ($id) {
     $_SESSION['success'] = "User berhasil ditambahkan";
 }
 
-header("Location: ?page=users");
+header("Location: " . $redirect);
 exit;
