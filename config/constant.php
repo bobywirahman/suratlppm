@@ -12,6 +12,7 @@ define('APP_ROOT_URL', $protocol . '://' . ($_SERVER['HTTP_HOST'] ?? 'localhost'
 define('ROLE_ADMIN', 'admin');
 define('ROLE_STAFF', 'staff');
 define('ROLE_RESEARCHER', 'researcher');
+define('ROLE_MAHASISWA', 'mahasiswa');
 
 // Document Types
 define('DOC_TYPE_PENELITIAN', 'penelitian');

@@ -152,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
                 htmlspecialchars($alamat, ENT_QUOTES, 'UTF-8'),
             ]);
             $newUserId = $pdo->lastInsertId();
-            $pdo->prepare("INSERT INTO user_roles (user_id, role_id) SELECT ?, id FROM roles WHERE name = 'researcher'")->execute([$newUserId]);
+            $pdo->prepare("INSERT INTO user_roles (user_id, role_id) SELECT ?, id FROM roles WHERE name = 'mahasiswa'")->execute([$newUserId]);
             logActivity('Registrasi Akun', 'Pendaftaran akun baru: ' . $username . ' (' . $full_name . ')');
             $_SESSION['pesan'] = 'Akun berhasil didaftarkan! Silakan tunggu aktivasi oleh admin.';
             header("Location: " . SITE_URL . "?page=pesan");

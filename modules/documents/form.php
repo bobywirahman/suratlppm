@@ -117,7 +117,12 @@ if ($editDoc && $editDoc['status'] === STATUS_REVISI) {
                     <option value="">Pilih Tipe</option>
                     <?php
                     $editType = $editDoc['type'] ?? '';
-                    $typeList = $pdo->query("SELECT * FROM document_types WHERE is_active = 1 ORDER BY name")->fetchAll();
+                    $typeStmt = $pdo->prepare("SELECT dt.* FROM document_types dt WHERE dt.is_active = 1
+                        AND (NOT EXISTS (SELECT 1 FROM document_type_roles dtr WHERE dtr.type_id = dt.id)
+                             OR EXISTS (SELECT 1 FROM document_type_roles dtr2 JOIN roles r ON r.id = dtr2.role_id WHERE dtr2.type_id = dt.id AND r.name = ?))
+                        ORDER BY dt.name");
+                    $typeStmt->execute([$user['role']]);
+                    $typeList = $typeStmt->fetchAll();
                     $typeFound = false;
                     foreach ($typeList as $t) {
                         if ($t['code'] === $editType) { $typeFound = true; break; }

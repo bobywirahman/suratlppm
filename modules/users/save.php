@@ -6,7 +6,7 @@ $id = $_POST['id'] ?? null;
 $back = $_POST['back'] ?? '';
 if ($back !== '') {
     parse_str($back, $backParts);
-    if (!empty(array_diff(array_keys($backParts), ['q', 'per_page', 'p']))) $back = '';
+    if (!empty(array_diff(array_keys($backParts), ['q', 'per_page', 'status', 'p']))) $back = '';
     $back = preg_replace('/[^a-zA-Z0-9_%&=+ ]/', '', $back);
 }
 $redirect = '?page=users' . ($back !== '' ? '&' . $back : '');
@@ -17,7 +17,7 @@ $nim = trim($_POST['nim'] ?? '') ?: null;
 $no_hp = trim($_POST['no_hp'] ?? '') ?: null;
 $email = trim($_POST['email'] ?? '');
 $password = $_POST['password'] ?? '';
-$role = $_POST['role'] ?? 'researcher';
+$role = $_POST['role'] ?? 'mahasiswa';
 $department_id = $_POST['department_id'] ?: null;
 $alamat = trim($_POST['alamat'] ?? '');
 $is_active = isset($_POST['is_active']) ? 1 : 0;

@@ -8,8 +8,9 @@ $editUser = null;
 $q = trim($_GET['q'] ?? '');
 $perPageRaw = $_GET['per_page'] ?? '15';
 $perPage = in_array($perPageRaw, ['15', '20', '50', '100', 'all'], true) ? $perPageRaw : '15';
+$statusFilter = in_array($_GET['status'] ?? '', ['', 'active', 'inactive'], true) ? ($_GET['status'] ?? '') : '';
 $p = max(1, (int)($_GET['p'] ?? 1));
-$listParams = 'q=' . urlencode($q) . '&per_page=' . urlencode($perPage) . '&p=' . $p;
+$listParams = 'q=' . urlencode($q) . '&per_page=' . urlencode($perPage) . '&status=' . urlencode($statusFilter) . '&p=' . $p;
 
 $adminIds = $pdo->query("SELECT user_id FROM user_roles WHERE role_id = (SELECT id FROM roles WHERE name = 'admin')")->fetchAll(PDO::FETCH_COLUMN);
 $adminGuard = empty($adminIds) ? '1=1' : 'id NOT IN (' . implode(',', $adminIds) . ')';
@@ -29,7 +30,29 @@ if ($action === 'reject' && isset($_GET['id'])) {
 }
 
 if ($action === 'delete' && isset($_GET['id'])) {
-    $pdo->prepare("DELETE FROM users WHERE id = ? AND $adminGuard")->execute([$_GET['id']]);
+    $deleteId = (int)$_GET['id'];
+    // Bersihkan data terkait agar tidak melanggar foreign key
+    $pdo->prepare("DELETE FROM user_activity WHERE user_id = ?")->execute([$deleteId]);
+    $pdo->prepare("DELETE FROM approvals WHERE approver_id = ?")->execute([$deleteId]);
+    $pdo->prepare("DELETE FROM document_revisions WHERE reviser_id = ?")->execute([$deleteId]);
+    $docStmt = $pdo->prepare("SELECT id FROM documents WHERE applicant_id = ? OR created_by = ?");
+    $docStmt->execute([$deleteId, $deleteId]);
+    foreach ($docStmt->fetchAll() as $dd) {
+        $attDel = $pdo->prepare("SELECT file_path FROM document_attachments WHERE document_id = ?");
+        $attDel->execute([$dd['id']]);
+        foreach ($attDel->fetchAll() as $a) {
+            if (!empty($a['file_path'])) {
+                $abs = upload_path($a['file_path']);
+                if ($abs && file_exists($abs)) @unlink($abs);
+            }
+        }
+        $pdo->prepare("DELETE FROM approvals WHERE document_id = ?")->execute([$dd['id']]);
+        $pdo->prepare("DELETE FROM document_attachments WHERE document_id = ?")->execute([$dd['id']]);
+        $pdo->prepare("DELETE FROM document_revisions WHERE document_id = ?")->execute([$dd['id']]);
+        $pdo->prepare("DELETE FROM research_projects WHERE document_id = ?")->execute([$dd['id']]);
+    }
+    $pdo->prepare("DELETE FROM documents WHERE applicant_id = ? OR created_by = ?")->execute([$deleteId, $deleteId]);
+    $pdo->prepare("DELETE FROM users WHERE id = ? AND $adminGuard")->execute([$deleteId]);
     $_SESSION['success'] = "User berhasil dihapus";
     header("Location: ?page=users&" . $listParams);
     exit;
@@ -53,6 +76,9 @@ if ($q !== '') {
         ':sq_prodi' => $like, ':sq_role' => $like,
     ];
 }
+// Filter berdasarkan status
+if ($statusFilter === 'active') $searchWhere .= " AND u.is_active = 1";
+elseif ($statusFilter === 'inactive') $searchWhere .= " AND u.is_active = 0";
 
 $fromSql = "FROM users u
             LEFT JOIN departments d ON u.department_id = d.id
@@ -182,18 +208,25 @@ ob_start();
             <form method="get" action="?page=users" class="d-flex gap-2" role="search" style="max-width: 480px;">
                 <input type="hidden" name="page" value="users">
                 <input type="hidden" name="p" value="1">
+                <input type="hidden" name="status" value="<?php echo htmlspecialchars($statusFilter); ?>">
                 <div class="input-group input-group-sm">
                     <span class="input-group-text bg-white text-muted"><i class="fas fa-search"></i></span>
                     <input type="text" name="q" class="form-control" placeholder="Cari nama, email, username, NIP, NIM, No. HP, alamat, prodi, role..." value="<?php echo htmlspecialchars($q); ?>">
                 </div>
                 <button type="submit" class="btn btn-primary btn-sm rounded-pill px-3">Cari</button>
-                <?php if ($q !== ''): ?>
+                <?php if ($q !== '' || $statusFilter !== ''): ?>
                 <a href="?page=users" class="btn btn-outline-secondary btn-sm rounded-pill px-3">Reset</a>
                 <?php endif; ?>
             </form>
             <div class="d-flex align-items-center gap-2">
+                <span class="text-muted small">Status</span>
+                <select class="form-select form-select-sm" style="width:auto;" onchange="location.href='?page=users&q=<?php echo urlencode($q); ?>&status='+this.value+'&per_page=<?php echo urlencode($perPage); ?>&p=1';" aria-label="Filter status">
+                    <option value="" <?php echo $statusFilter === '' ? 'selected' : ''; ?>>Semua</option>
+                    <option value="active" <?php echo $statusFilter === 'active' ? 'selected' : ''; ?>>Aktif</option>
+                    <option value="inactive" <?php echo $statusFilter === 'inactive' ? 'selected' : ''; ?>>Menunggu</option>
+                </select>
                 <span class="text-muted small">Tampilkan</span>
-                <select class="form-select form-select-sm" style="width:auto;" onchange="location.href='?page=users&q=<?php echo urlencode($q); ?>&per_page='+this.value+'&p=1';" aria-label="Jumlah data per halaman">
+                <select class="form-select form-select-sm" style="width:auto;" onchange="location.href='?page=users&q=<?php echo urlencode($q); ?>&status=<?php echo urlencode($statusFilter); ?>&per_page='+this.value+'&p=1';" aria-label="Jumlah data per halaman">
                     <?php foreach (['15', '20', '50', '100', 'all'] as $opt): ?>
                         <option value="<?php echo $opt; ?>" <?php echo $perPage === $opt ? 'selected' : ''; ?>><?php echo $opt === 'all' ? 'Semua' : $opt; ?></option>
                     <?php endforeach; ?>
@@ -267,7 +300,7 @@ ob_start();
             <nav aria-label="Paginasi daftar user">
                 <ul class="pagination pagination-sm mb-0">
                     <li class="page-item <?php echo $p <= 1 ? 'disabled' : ''; ?>">
-                        <a class="page-link" href="?page=users&q=<?php echo urlencode($q); ?>&per_page=<?php echo $perPage; ?>&p=<?php echo $p - 1; ?>">&laquo;</a>
+                        <a class="page-link" href="?page=users&q=<?php echo urlencode($q); ?>&per_page=<?php echo $perPage; ?>&status=<?php echo urlencode($statusFilter); ?>&p=<?php echo $p - 1; ?>">&laquo;</a>
                     </li>
                     <?php
                     $startPg = max(1, min($p - 3, $totalPages - 6));
@@ -275,11 +308,11 @@ ob_start();
                     for ($i = $startPg; $i <= $endPg; $i++):
                     ?>
                     <li class="page-item <?php echo $i === $p ? 'active' : ''; ?>">
-                        <a class="page-link" href="?page=users&q=<?php echo urlencode($q); ?>&per_page=<?php echo $perPage; ?>&p=<?php echo $i; ?>"><?php echo $i; ?></a>
+                        <a class="page-link" href="?page=users&q=<?php echo urlencode($q); ?>&per_page=<?php echo $perPage; ?>&status=<?php echo urlencode($statusFilter); ?>&p=<?php echo $i; ?>"><?php echo $i; ?></a>
                     </li>
                     <?php endfor; ?>
                     <li class="page-item <?php echo $p >= $totalPages ? 'disabled' : ''; ?>">
-                        <a class="page-link" href="?page=users&q=<?php echo urlencode($q); ?>&per_page=<?php echo $perPage; ?>&p=<?php echo $p + 1; ?>">&raquo;</a>
+                        <a class="page-link" href="?page=users&q=<?php echo urlencode($q); ?>&per_page=<?php echo $perPage; ?>&status=<?php echo urlencode($statusFilter); ?>&p=<?php echo $p + 1; ?>">&raquo;</a>
                     </li>
                 </ul>
             </nav>
