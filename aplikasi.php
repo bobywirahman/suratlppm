@@ -111,53 +111,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
     if ($konfirmasi === '') $errors[] = 'Konfirmasi Password';
 
     if (!empty($errors)) {
-        $_SESSION['register_error'] = 'Semua data harus diisi: ' . implode(', ', $errors);
+        $_SESSION['error'] = 'Semua data harus diisi: ' . implode(', ', $errors);
         $_SESSION['register_old'] = $_POST;
         header("Location: " . SITE_URL . "?page=register");
         exit;
     } elseif (strlen($password) < 8) {
-        $_SESSION['register_error'] = 'Password minimal 8 karakter';
+        $_SESSION['error'] = 'Password minimal 8 karakter';
         $_SESSION['register_old'] = $_POST;
         header("Location: " . SITE_URL . "?page=register");
         exit;
     } elseif ($password !== $konfirmasi) {
-        $_SESSION['register_error'] = 'Konfirmasi password tidak cocok';
+        $_SESSION['error'] = 'Konfirmasi password tidak cocok';
         $_SESSION['register_old'] = $_POST;
         header("Location: " . SITE_URL . "?page=register");
         exit;
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $_SESSION['register_error'] = 'Format email tidak valid';
+        $_SESSION['error'] = 'Format email tidak valid';
         $_SESSION['register_old'] = $_POST;
         header("Location: " . SITE_URL . "?page=register");
         exit;
     } else {
-        $check = $pdo->prepare("SELECT id FROM users WHERE email = ? OR username = ?");
-        $check->execute([$email, $username]);
-        if ($check->fetch()) {
-            $_SESSION['register_error'] = 'Email atau Username sudah terdaftar';
+        $emailCheck = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+        $emailCheck->execute([$email]);
+        if ($emailCheck->fetch()) {
+            $_SESSION['error'] = 'Email anda sudah terdaftar';
             $_SESSION['register_old'] = $_POST;
             header("Location: " . SITE_URL . "?page=register");
             exit;
-        } else {
-            $stmt = $pdo->prepare("INSERT INTO users (full_name, username, nim, email, no_hp, password, department_id, alamat, is_active)
-                                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)");
-            $stmt->execute([
-                htmlspecialchars($full_name, ENT_QUOTES, 'UTF-8'),
-                htmlspecialchars($username, ENT_QUOTES, 'UTF-8'),
-                htmlspecialchars($nim, ENT_QUOTES, 'UTF-8'),
-                htmlspecialchars($email, ENT_QUOTES, 'UTF-8'),
-                htmlspecialchars($no_hp, ENT_QUOTES, 'UTF-8'),
-                password_hash($password, PASSWORD_DEFAULT),
-                $department_id,
-                htmlspecialchars($alamat, ENT_QUOTES, 'UTF-8'),
-            ]);
-            $newUserId = $pdo->lastInsertId();
-            $pdo->prepare("INSERT INTO user_roles (user_id, role_id) SELECT ?, id FROM roles WHERE name = 'mahasiswa'")->execute([$newUserId]);
-            logActivity('Registrasi Akun', 'Pendaftaran akun baru: ' . $username . ' (' . $full_name . ')');
-            $_SESSION['pesan'] = 'Akun berhasil didaftarkan! Silakan tunggu aktivasi oleh admin.';
-            header("Location: " . SITE_URL . "?page=pesan");
+        }
+        $usernameCheck = $pdo->prepare("SELECT id FROM users WHERE username = ?");
+        $usernameCheck->execute([$username]);
+        if ($usernameCheck->fetch()) {
+            $_SESSION['error'] = 'Username sudah terdaftar';
+            $_SESSION['register_old'] = $_POST;
+            header("Location: " . SITE_URL . "?page=register");
             exit;
         }
+        $stmt = $pdo->prepare("INSERT INTO users (full_name, username, nim, email, no_hp, password, department_id, alamat, is_active)
+                               VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)");
+        $stmt->execute([
+            htmlspecialchars($full_name, ENT_QUOTES, 'UTF-8'),
+            htmlspecialchars($username, ENT_QUOTES, 'UTF-8'),
+            htmlspecialchars($nim, ENT_QUOTES, 'UTF-8'),
+            htmlspecialchars($email, ENT_QUOTES, 'UTF-8'),
+            htmlspecialchars($no_hp, ENT_QUOTES, 'UTF-8'),
+            password_hash($password, PASSWORD_DEFAULT),
+            $department_id,
+            htmlspecialchars($alamat, ENT_QUOTES, 'UTF-8'),
+        ]);
+        $newUserId = $pdo->lastInsertId();
+        $pdo->prepare("INSERT INTO user_roles (user_id, role_id) SELECT ?, id FROM roles WHERE name = 'mahasiswa'")->execute([$newUserId]);
+        logActivity('Registrasi Akun', 'Pendaftaran akun baru: ' . $username . ' (' . $full_name . ')');
+        $_SESSION['pesan'] = 'Akun berhasil didaftarkan! Silakan tunggu aktivasi oleh admin.';
+        header("Location: " . SITE_URL . "?page=pesan");
+        exit;
     }
 }
 
@@ -166,16 +173,15 @@ $page = $_GET['page'] ?? '';
 // Protected routes - require login (except register and pesan pages)
 if (!isset($_SESSION['user_id'])) {
     if ($page === 'register') {
-        unset($_SESSION['error'], $_SESSION['success'], $_SESSION['register_error'], $_SESSION['register_old']);
+        unset($_SESSION['error'], $_SESSION['success']);
         $pdo = db();
         $faculties = $pdo->query("SELECT * FROM faculties ORDER BY name")->fetchAll();
         $departments = $pdo->query("SELECT * FROM departments ORDER BY name")->fetchAll();
-        $error_msg = '';
-        $old = [];
+        $old = $_SESSION['register_old'] ?? [];
+        unset($_SESSION['register_old']);
         includeView('auth/register.php', [
             'faculties' => $faculties,
             'departments' => $departments,
-            'error_msg' => $error_msg,
             'old' => $old,
             'messages' => '',
             'messageType' => 'success'
