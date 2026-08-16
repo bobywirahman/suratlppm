@@ -145,11 +145,11 @@ function fmtDate($val) {
                                 $typeLabel->execute([$document['type']]);
                                 $tn = $typeLabel->fetchColumn();
                                 ?>
-                                <span class="badge bg-secondary"><?php echo htmlspecialchars($tn ?: $document['type']); ?></span>
+                                <span class="badge bg-secondary d-inline-block text-start" style="white-space:normal; word-break:break-word; max-width:100%;"><?php echo htmlspecialchars($tn ?: $document['type']); ?></span>
                             </div>
                             <div class="col-md-3">
                                 <small class="text-muted d-block">Status</small>
-                                <span class="badge <?php echo $st['class']; ?>"><?php echo $st['label']; ?></span>
+                                <span class="badge <?php echo $st['class']; ?> d-inline-block text-start" style="white-space:normal; word-break:break-word; max-width:100%;"><?php echo $st['label']; ?></span>
                             </div>
                             <?php if (!empty($document['description'])): ?>
                                 <div class="col-12">

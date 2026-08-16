@@ -56,15 +56,15 @@ $stmt = $this->pdo->prepare($sql);
         $params = [];
         $where = [];
 
-        if (isset($filters['status'])) {
+        if (!empty($filters['status'])) {
             $where[] = "d.status = ?";
             $params[] = $filters['status'];
         }
-        if (isset($filters['applicant_id'])) {
+        if (!empty($filters['applicant_id'])) {
             $where[] = "d.applicant_id = ?";
             $params[] = $filters['applicant_id'];
         }
-        if (isset($filters['department_id'])) {
+        if (!empty($filters['department_id'])) {
             $where[] = "d.department_id = ?";
             $params[] = $filters['department_id'];
         }
@@ -98,15 +98,15 @@ $stmt = $this->pdo->prepare($sql);
         $params = [];
         $where = [];
 
-        if (isset($filters['status'])) {
+        if (!empty($filters['status'])) {
             $where[] = "d.status = ?";
             $params[] = $filters['status'];
         }
-        if (isset($filters['applicant_id'])) {
+        if (!empty($filters['applicant_id'])) {
             $where[] = "d.applicant_id = ?";
             $params[] = $filters['applicant_id'];
         }
-        if (isset($filters['department_id'])) {
+        if (!empty($filters['department_id'])) {
             $where[] = "d.department_id = ?";
             $params[] = $filters['department_id'];
         }
