@@ -69,10 +69,10 @@
                                 <th>Program Studi</th>
                             <?php endif; ?>
                             <th>No. HP Pengaju</th>
-                            <th>Judul Surat</th>
+                            <th style="max-width:280px; width:26%;">Judul Surat</th>
                             <th>Tipe</th>
                             <th>Status</th>
-                            <th style="min-width:140px;">Tanggal / Riwayat</th>
+                            <th style="width:230px;">Tanggal / Riwayat</th>
                             <th class="pe-3">Aksi</th>
                         </tr>
                     </thead>
@@ -93,21 +93,21 @@
                             $created = $doc['created_at'] ?? $doc['updated_at'] ?? '';
                             $timeline = [];
                             if ($s === STATUS_DRAFT) {
-                                $timeline[] = '<small class="text-muted d-block">Dibuat: ' . date('d/m/Y H:i', strtotime($created)) . '</small>';
+                                $timeline[] = '<small class="text-muted d-block" style="white-space:nowrap;">Dibuat: ' . date('d/m/Y H:i', strtotime($created)) . '</small>';
                             } else {
-                                $timeline[] = '<small class="text-muted d-block">Diajukan: ' . date('d/m/Y H:i', strtotime($doc['submitted_at'] ?? $created)) . '</small>';
+                                $timeline[] = '<small class="text-muted d-block" style="white-space:nowrap;">Diajukan: ' . date('d/m/Y H:i', strtotime($doc['submitted_at'] ?? $created)) . '</small>';
                             }
                             if (!empty($doc['in_progress_at'])) {
-                                $timeline[] = '<small class="text-muted d-block">Diproses: ' . date('d/m/Y H:i', strtotime($doc['in_progress_at'])) . '</small>';
+                                $timeline[] = '<small class="text-muted d-block" style="white-space:nowrap;">Diproses: ' . date('d/m/Y H:i', strtotime($doc['in_progress_at'])) . '</small>';
                             }
                             if ($s === STATUS_APPROVED && !empty($doc['approved_at'])) {
-                                $timeline[] = '<small class="text-success d-block">Disetujui: ' . date('d/m/Y H:i', strtotime($doc['approved_at'])) . '</small>';
+                                $timeline[] = '<small class="text-success d-block" style="white-space:nowrap;">Disetujui: ' . date('d/m/Y H:i', strtotime($doc['approved_at'])) . '</small>';
                             }
                             if (!empty($doc['completed_at'])) {
-                                $timeline[] = '<small class="text-success d-block">Selesai: ' . date('d/m/Y H:i', strtotime($doc['completed_at'])) . '</small>';
+                                $timeline[] = '<small class="text-success d-block" style="white-space:nowrap;">Selesai: ' . date('d/m/Y H:i', strtotime($doc['completed_at'])) . '</small>';
                             }
                             if ($s === STATUS_REVISI && !empty($doc['in_progress_at'])) {
-                                $timeline[] = '<small class="text-warning d-block">Direvisi: ' . date('d/m/Y H:i', strtotime($doc['in_progress_at'])) . '</small>';
+                                $timeline[] = '<small class="text-warning d-block" style="white-space:nowrap;">Direvisi: ' . date('d/m/Y H:i', strtotime($doc['in_progress_at'])) . '</small>';
                             }
                         ?>
                         <tr>
@@ -126,7 +126,7 @@
                                     <span class="text-muted">-</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="fw-semibold"><?php echo htmlspecialchars($doc['title']); ?></td>
+                            <td class="fw-semibold" style="max-width:280px; word-break:break-word;"><?php echo htmlspecialchars($doc['title']); ?></td>
                             <td><span class="badge bg-secondary"><?php echo ucfirst(str_replace('_', ' ', $doc['type'])); ?></span></td>
                             <td><span class="badge <?php echo $st['class']; ?>"><?php echo $st['label']; ?></span></td>
                             <td><?php echo implode('', $timeline); ?></td>
