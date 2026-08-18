@@ -317,6 +317,13 @@ $hasMaster = hasPermission('manage_document_types') || hasPermission('manage_dep
                                             </a>
                                         </li>
                                         <?php endif; ?>
+                                        <?php if (!empty($user['role']) && $user['role'] === ROLE_ADMIN): ?>
+                                        <li class="nav-item">
+                                            <a class="nav-link py-2 small" href="<?php echo APP_ROOT_URL; ?>/audit_security.php" target="_blank">
+                                                <i class="fas fa-shield-halved me-2"></i> Audit Keamanan
+                                            </a>
+                                        </li>
+                                        <?php endif; ?>
                                     </ul>
                                 </div>
                             </li>
