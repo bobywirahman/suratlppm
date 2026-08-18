@@ -244,6 +244,7 @@ ob_start();
                         <th>Username</th>
                         <th>Role</th>
                         <th>Program Studi</th>
+                        <th>No. HP</th>
                         <th>Status</th>
                         <th class="pe-3">Aksi</th>
                     </tr>
@@ -251,7 +252,7 @@ ob_start();
                 <tbody>
                     <?php if (empty($users)): ?>
                     <tr>
-                        <td colspan="8" class="text-center text-muted py-5">
+                        <td colspan="9" class="text-center text-muted py-5">
                             <i class="fas fa-user-slash fa-2x mb-2"></i><br>
                             <?php echo $q !== '' ? 'Tidak ada user yang cocok dengan pencarian &ldquo;' . htmlspecialchars($q) . '&rdquo;.' : 'Belum ada user.'; ?>
                         </td>
@@ -265,6 +266,15 @@ ob_start();
                         <td><?php echo htmlspecialchars($u['username'] ?? '-'); ?></td>
                         <td><span class="badge bg-<?php echo $u['role'] === 'admin' ? 'danger' : ($u['role'] === 'staff' ? 'warning' : 'info'); ?>"><?php echo htmlspecialchars($roleMap[$u['role']] ?? ($u['role'] ? ucfirst($u['role']) : '-')); ?></span></td>
                         <td><?php echo htmlspecialchars($u['department_name'] ?? '-'); ?></td>
+                        <td>
+                            <?php if (!empty($u['no_hp'])): ?>
+                                <a href="https://wa.me/<?php echo waNumber($u['no_hp']); ?>" target="_blank" rel="noopener" class="text-decoration-none" title="Chat via WhatsApp">
+                                    <i class="fab fa-whatsapp text-success me-1"></i><?php echo htmlspecialchars($u['no_hp']); ?>
+                                </a>
+                            <?php else: ?>
+                                -
+                            <?php endif; ?>
+                        </td>
                         <td>
                             <?php if ($u['is_active']): ?>
                                 <span class="badge bg-success">Aktif</span>

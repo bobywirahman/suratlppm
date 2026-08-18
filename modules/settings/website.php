@@ -15,12 +15,7 @@ $heroTitle = g('hero_title', 'Inovasi & Riset<br><span>Untuk Negeri</span>');
 $heroSubtitle = g('hero_subtitle', 'Berkomitmen mendorong penelitian, pengabdian masyarakat, dan publikasi ilmiah yang berdampak nyata.');
 $heroImage = g('hero_image', '');
 $heroImageSrc = asset($heroImage);
-$heroStat1Num = g('hero_stat1_num', '50+');
-$heroStat1Label = g('hero_stat1_label', 'Penelitian');
-$heroStat2Num = g('hero_stat2_num', '120+');
-$heroStat2Label = g('hero_stat2_label', 'Pengabdian');
-$heroStat3Num = g('hero_stat3_num', '200+');
-$heroStat3Label = g('hero_stat3_label', 'Publikasi');
+$trustBadges = json_decode(g('trust_badges', '[]'), true) ?: [];
 
 $sectionLayananBadge = g('section_layanan_badge', 'Layanan Kami');
 $sectionLayananTitle = g('section_layanan_title', 'Fokus <span style="color:#FF6B35;">Bidang</span>');
@@ -127,18 +122,20 @@ document.addEventListener('DOMContentLoaded', function () {
                                 </div>
                                 <?php endif; ?>
                             </div>
-                            <p class="small text-muted">Statistik Hero (tampil di samping tombol):</p>
-                            <div class="row g-2 mb-2">
-                                <div class="col-md-2"><input type="text" name="hero_stat1_num" class="form-control form-control-sm" placeholder="Angka" value="<?php echo htmlspecialchars($heroStat1Num); ?>"></div>
-                                <div class="col-md-4"><input type="text" name="hero_stat1_label" class="form-control form-control-sm" placeholder="Label 1" value="<?php echo htmlspecialchars($heroStat1Label); ?>"></div>
-                                <div class="col-md-2"><input type="text" name="hero_stat2_num" class="form-control form-control-sm" placeholder="Angka" value="<?php echo htmlspecialchars($heroStat2Num); ?>"></div>
-                                <div class="col-md-4"><input type="text" name="hero_stat2_label" class="form-control form-control-sm" placeholder="Label 2" value="<?php echo htmlspecialchars($heroStat2Label); ?>"></div>
+                            <p class="small text-muted mb-2">Trust Badges (tampil di hero, di samping tombol). Gunakan <a href="https://fontawesome.com/v6/search" target="_blank">Font Awesome class</a> untuk icon (contoh: <code>fa-award</code>).</p>
+                            <?php for ($i = 0; $i < 4; $i++): $tb = $trustBadges[$i] ?? ['icon' => '', 'title' => '', 'desc' => '']; ?>
+                            <div class="row g-2 mb-2 border-bottom pb-2">
+                                <div class="col-md-2">
+                                    <input type="text" name="trust_badge_icon[<?php echo $i; ?>]" class="form-control form-control-sm" placeholder="Icon class" value="<?php echo htmlspecialchars($tb['icon']); ?>">
+                                </div>
+                                <div class="col-md-4">
+                                    <input type="text" name="trust_badge_title[<?php echo $i; ?>]" class="form-control form-control-sm" placeholder="Nama" value="<?php echo htmlspecialchars($tb['title']); ?>">
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" name="trust_badge_desc[<?php echo $i; ?>]" class="form-control form-control-sm" placeholder="Sub-teks (opsional)" value="<?php echo htmlspecialchars($tb['desc']); ?>">
+                                </div>
                             </div>
-                            <div class="row g-2">
-                                <div class="col-md-2"><input type="text" name="hero_stat3_num" class="form-control form-control-sm" placeholder="Angka" value="<?php echo htmlspecialchars($heroStat3Num); ?>"></div>
-                                <div class="col-md-4"><input type="text" name="hero_stat3_label" class="form-control form-control-sm" placeholder="Label 3" value="<?php echo htmlspecialchars($heroStat3Label); ?>"></div>
-                                <div class="col-md-6"></div>
-                            </div>
+                            <?php endfor; ?>
                         </div>
 
                         <!-- Layanan -->

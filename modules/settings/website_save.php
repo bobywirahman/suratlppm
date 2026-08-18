@@ -12,10 +12,14 @@ saveSetting('hero_badge', trim($_POST['hero_badge'] ?? ''));
 saveSetting('hero_title', trim($_POST['hero_title'] ?? ''));
 saveSetting('hero_subtitle', trim($_POST['hero_subtitle'] ?? ''));
 saveSetting('hero_image', upload_rel($_POST['hero_image'] ?? ''));
-for ($i = 1; $i <= 3; $i++) {
-    saveSetting("hero_stat{$i}_num", trim($_POST["hero_stat{$i}_num"] ?? ''));
-    saveSetting("hero_stat{$i}_label", trim($_POST["hero_stat{$i}_label"] ?? ''));
+$trustBadges = [];
+for ($i = 0; $i < 4; $i++) {
+    $icon = trim($_POST['trust_badge_icon'][$i] ?? '');
+    $title = trim($_POST['trust_badge_title'][$i] ?? '');
+    $desc = trim($_POST['trust_badge_desc'][$i] ?? '');
+    if ($title) $trustBadges[] = ['icon' => $icon, 'title' => $title, 'desc' => $desc];
 }
+saveSetting('trust_badges', json_encode($trustBadges));
 saveSetting('section_layanan_badge', trim($_POST['section_layanan_badge'] ?? ''));
 saveSetting('section_layanan_title', trim($_POST['section_layanan_title'] ?? ''));
 saveSetting('section_tentang_badge', trim($_POST['section_tentang_badge'] ?? ''));

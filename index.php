@@ -9,11 +9,13 @@ $heroBadge = getSetting('hero_badge', 'Lembaga Penelitian & Pengabdian');
 $heroTitle = getSetting('hero_title', 'Inovasi & Riset<br><span>Untuk Negeri</span>');
 $heroSubtitle = getSetting('hero_subtitle', 'Berkomitmen mendorong penelitian, pengabdian masyarakat, dan publikasi ilmiah yang berdampak nyata.');
 $heroImage = getSetting('hero_image', 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=600&q=80');
-$heroStatDefaults = [1=>['50+','Penelitian'],2=>['120+','Pengabdian'],3=>['200+','Publikasi']];
-for ($i = 1; $i <= 3; $i++) {
-    ${"heroStat{$i}Num"} = getSetting("hero_stat{$i}_num", $heroStatDefaults[$i][0]);
-    ${"heroStat{$i}Label"} = getSetting("hero_stat{$i}_label", $heroStatDefaults[$i][1]);
-}
+$heroTrustDefaults = [
+    ['icon' => 'fa-award', 'title' => 'Terakreditasi', 'desc' => 'BAN-PT'],
+    ['icon' => 'fa-magnifying-glass', 'title' => 'Terindeks', 'desc' => 'SINTA'],
+    ['icon' => 'fa-file-shield', 'title' => 'Legalitas', 'desc' => 'SK DIKTI'],
+];
+$heroTrustBadges = json_decode(getSetting('trust_badges', '[]'), true) ?: [];
+if (empty($heroTrustBadges)) $heroTrustBadges = $heroTrustDefaults;
 $sectionLayananBadge = getSetting('section_layanan_badge', 'Layanan Kami');
 $sectionLayananTitle = getSetting('section_layanan_title', 'Fokus <span style="color:#FF6B35;">Bidang</span>');
 $sectionTentangBadge = getSetting('section_tentang_badge', 'Tentang Kami');
@@ -175,6 +177,7 @@ try {
         .info-card .btn-info-read:hover { background: #e85d2a; }
         .info-card .btn-info-link { color: #FF6B35; font-size: 0.78rem; font-weight: 600; text-decoration: none; }
     </style>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 </head>
 <body>
 
@@ -205,21 +208,29 @@ try {
     <div class="container position-relative">
         <div class="row align-items-center g-5">
             <div class="col-lg-5">
-                <div class="hero-badge mb-4"><i class="fas fa-certificate"></i> <?php echo htmlspecialchars($heroBadge); ?></div>
-                <h1><?php echo $heroTitle; ?></h1>
-                <p><?php echo htmlspecialchars($heroSubtitle); ?></p>
-                <div class="d-flex flex-wrap gap-3 mt-4">
+                <div class="hero-badge mb-4" data-aos="fade-up" data-aos-delay="100"><i class="fas fa-certificate"></i> <?php echo htmlspecialchars($heroBadge); ?></div>
+                <h1 data-aos="fade-up" data-aos-delay="200"><?php echo $heroTitle; ?></h1>
+                <p data-aos="fade-up" data-aos-delay="300"><?php echo htmlspecialchars($heroSubtitle); ?></p>
+                <div class="d-flex flex-wrap gap-3 mt-4" data-aos="fade-up" data-aos-delay="400">
                     <a href="<?php echo BASE_URL; ?>/aplikasi.php" class="btn btn-primary"><i class="fas fa-file-alt me-2"></i> Pengajuan Surat</a>
                     <a href="<?php echo BASE_URL; ?>/verifikasi.php" class="btn btn-outline-secondary"><i class="fas fa-shield-alt me-2"></i> Verifikasi Surat</a>
                     <a href="#layanan" class="btn btn-outline-secondary">Jelajahi Layanan</a>
                 </div>
-                <div class="d-flex gap-4 mt-5 pt-2">
-                    <div><h5 class="fw-bold mb-0" style="color:#1a1a2e;"><?php echo htmlspecialchars($heroStat1Num); ?></h5><small class="text-muted"><?php echo htmlspecialchars($heroStat1Label); ?></small></div>
-                    <div><h5 class="fw-bold mb-0" style="color:#1a1a2e;"><?php echo htmlspecialchars($heroStat2Num); ?></h5><small class="text-muted"><?php echo htmlspecialchars($heroStat2Label); ?></small></div>
-                    <div><h5 class="fw-bold mb-0" style="color:#1a1a2e;"><?php echo htmlspecialchars($heroStat3Num); ?></h5><small class="text-muted"><?php echo htmlspecialchars($heroStat3Label); ?></small></div>
+                <div class="d-flex flex-wrap gap-3 mt-5 pt-2" data-aos="fade-up" data-aos-delay="500">
+                    <?php foreach ($heroTrustBadges as $tb): ?>
+                    <div class="hero-badge d-flex align-items-center gap-2 py-2" style="cursor:default;">
+                        <i class="fas <?php echo htmlspecialchars($tb['icon'] ?? 'fa-certificate'); ?>"></i>
+                        <div class="lh-sm">
+                            <div class="fw-bold" style="font-size:.8rem;"><?php echo htmlspecialchars($tb['title'] ?? ''); ?></div>
+                            <?php if (!empty($tb['desc'])): ?>
+                            <small class="d-block text-muted" style="font-size:.68rem;"><?php echo htmlspecialchars($tb['desc']); ?></small>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <?php endforeach; ?>
                 </div>
             </div>
-            <div class="col-lg-7 text-center">
+            <div class="col-lg-7 text-center" data-aos="fade-left" data-aos-delay="200">
                 <img src="<?php echo htmlspecialchars(asset($heroImage)); ?>" alt="LPPM Research" class="hero-img">
             </div>
         </div>
@@ -228,14 +239,14 @@ try {
 
 <section class="py-5" id="layanan">
     <div class="container py-5">
-        <div class="text-center mb-5">
+        <div class="text-center mb-5" data-aos="fade-up">
             <span class="hero-badge mb-3"><i class="fas fa-cubes"></i> <?php echo htmlspecialchars($sectionLayananBadge); ?></span>
             <h2 class="section-title"><?php echo $sectionLayananTitle; ?></h2>
             <p class="section-subtitle"><?php echo htmlspecialchars($landSiteName); ?> melayani berbagai bidang penelitian dan pengabdian masyarakat</p>
         </div>
         <div class="row g-4">
-            <?php foreach ($services as $svc): ?>
-            <div class="col-md-4 col-lg-3">
+            <?php foreach ($services as $i => $svc): ?>
+            <div class="col-md-4 col-lg-3" data-aos="fade-up" data-aos-delay="<?php echo $i * 50; ?>">
                 <div class="service-card">
                     <div class="service-icon" style="background:rgba(255,107,53,0.1);color:#FF6B35;"><i class="fas <?php echo htmlspecialchars($svc['icon']); ?>"></i></div>
                     <h6><?php echo htmlspecialchars($svc['title']); ?></h6>
@@ -250,19 +261,19 @@ try {
 <section class="stats-section">
     <div class="container">
         <div class="row text-center g-4">
-            <div class="col-6 col-lg-3">
+            <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="0">
                 <h3><?php echo htmlspecialchars($stat1Num); ?></h3>
                 <p><?php echo htmlspecialchars($stat1Label); ?></p>
             </div>
-            <div class="col-6 col-lg-3">
+            <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="100">
                 <h3><?php echo htmlspecialchars($stat2Num); ?></h3>
                 <p><?php echo htmlspecialchars($stat2Label); ?></p>
             </div>
-            <div class="col-6 col-lg-3">
+            <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="200">
                 <h3><?php echo htmlspecialchars($stat3Num); ?></h3>
                 <p><?php echo htmlspecialchars($stat3Label); ?></p>
             </div>
-            <div class="col-6 col-lg-3">
+            <div class="col-6 col-lg-3" data-aos="fade-up" data-aos-delay="300">
                 <h3><?php echo htmlspecialchars($stat4Num); ?></h3>
                 <p><?php echo htmlspecialchars($stat4Label); ?></p>
             </div>
@@ -273,12 +284,12 @@ try {
 <section class="py-5 about-section" id="tentang">
     <div class="container py-5">
         <div class="row align-items-center g-5">
-            <div class="col-lg-5">
+            <div class="col-lg-5" data-aos="fade-right">
                 <div class="about-card">
                     <img src="<?php echo htmlspecialchars(asset($aboutImage)); ?>" alt="Tentang LPPM" class="w-100">
                 </div>
             </div>
-            <div class="col-lg-7">
+            <div class="col-lg-7" data-aos="fade-left">
                 <span class="hero-badge mb-3"><i class="fas fa-info-circle"></i> <?php echo htmlspecialchars($sectionTentangBadge); ?></span>
                 <h2 class="section-title"><?php echo $aboutTitle; ?></h2>
                 <p class="text-muted" style="line-height:1.8;"><?php echo $aboutContent; ?></p>
@@ -301,15 +312,15 @@ try {
 
 <section class="py-5 about-section" id="informasi">
     <div class="container py-5">
-        <div class="text-center mb-5">
+        <div class="text-center mb-5" data-aos="fade-up">
             <span class="hero-badge mb-3"><i class="fas fa-bullhorn"></i> Informasi LPPM</span>
             <h2 class="section-title">Berita &amp; <span style="color:#FF6B35;">Informasi</span></h2>
             <p class="section-subtitle">Kabar terbaru seputar kegiatan penelitian, pengabdian, dan publikasi <?php echo htmlspecialchars($landSiteName); ?></p>
         </div>
         <?php if ($informasiList): ?>
         <div class="row g-4">
-            <?php foreach ($informasiList as $info): ?>
-            <div class="col-md-6 col-lg-4">
+            <?php foreach ($informasiList as $i => $info): ?>
+            <div class="col-md-6 col-lg-4" data-aos="fade-up" data-aos-delay="<?php echo $i * 50; ?>">
                 <div class="info-card">
                     <?php if (!empty($info['thumbnail'])): ?>
                     <img src="<?php echo htmlspecialchars(asset($info['thumbnail'])); ?>" alt="<?php echo htmlspecialchars($info['judul']); ?>">
@@ -340,27 +351,27 @@ try {
 
 <section class="py-5" id="kontak">
     <div class="container py-5">
-        <div class="text-center mb-5">
+        <div class="text-center mb-5" data-aos="fade-up">
             <span class="hero-badge mb-3"><i class="fas fa-address-card"></i> <?php echo htmlspecialchars($sectionKontakBadge); ?></span>
             <h2 class="section-title"><?php echo $sectionKontakTitle; ?></h2>
             <p class="section-subtitle">Hubungi <?php echo htmlspecialchars($landSiteName); ?> untuk informasi lebih lanjut dan kemitraan riset</p>
         </div>
         <div class="row g-4 justify-content-center">
-            <div class="col-md-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="0">
                 <div class="service-card text-center">
                     <div class="service-icon mx-auto" style="background:rgba(255,107,53,0.1);color:#FF6B35;"><i class="fas fa-map-marker-alt"></i></div>
                     <h6>Alamat</h6>
                     <p><?php echo nl2br(htmlspecialchars($contactAddress)); ?></p>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="100">
                 <div class="service-card text-center">
                     <div class="service-icon mx-auto" style="background:rgba(255,107,53,0.1);color:#FF6B35;"><i class="fas fa-envelope"></i></div>
                     <h6>Email</h6>
                     <p><?php echo htmlspecialchars($contactEmail); ?></p>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4" data-aos="fade-up" data-aos-delay="200">
                 <div class="service-card text-center">
                     <div class="service-icon mx-auto" style="background:rgba(255,107,53,0.1);color:#FF6B35;"><i class="fas fa-phone"></i></div>
                     <h6>Telepon</h6>
@@ -421,6 +432,42 @@ try {
 <?php endif; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+AOS.init({ duration: 700, once: true, offset: 100 });
+</script>
+<script>
+(function() {
+    var section = document.querySelector('.stats-section');
+    if (!section) return;
+    var counters = section.querySelectorAll('h3');
+    var started = false;
+    function animateCounters() {
+        var rect = section.getBoundingClientRect();
+        if (rect.top < window.innerHeight - 100 && !started) {
+            started = true;
+            counters.forEach(function(el) {
+                var text = el.textContent.trim();
+                var target = parseInt(text.replace(/[^0-9]/g, ''), 10) || 0;
+                var suffix = text.replace(/[0-9]/g, '');
+                var count = 0;
+                var speed = target / 80;
+                (function update() {
+                    count += speed;
+                    if (count < target) {
+                        el.textContent = Math.floor(count) + suffix;
+                        requestAnimationFrame(update);
+                    } else {
+                        el.textContent = target + suffix;
+                    }
+                })();
+            });
+        }
+    }
+    window.addEventListener('scroll', animateCounters);
+    animateCounters();
+})();
+</script>
 <script>
 window.addEventListener('scroll', function() {
     document.getElementById('scrollTop').style.display = window.scrollY > 400 ? 'flex' : 'none';
