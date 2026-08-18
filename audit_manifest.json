@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-08-18T07:25:08+02:00",
+    "generated_at": "2026-08-18T09:57:45+02:00",
     "files": [
         ".gitignore",
         ".htaccess",
@@ -72,6 +72,7 @@
         "modules/settings/website_save.php",
         "modules/users/index.php",
         "modules/users/save.php",
+        "uploads/.htaccess",
         "uploads/informasi/lamp_6a73e8a296d99.pdf",
         "uploads/informasi/lamp_6a758ac7026e6.pdf",
         "uploads/informasi/thumb_6a73e26b46557.jpg",
