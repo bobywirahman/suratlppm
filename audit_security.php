@@ -16,6 +16,8 @@ define('AUDIT_ALLOW_IPS', []);                  // kosong = tanpa batasan IP; is
 define('AUDIT_EXCLUDE_DIRS', ['.git', 'assets/lib']);
 define('AUDIT_RISKY_EXT', ['php', 'phtml', 'php3', 'php4', 'php5', 'php6', 'php7', 'php8', 'phar', 'pht', 'shtml', 'cgi']);
 
+date_default_timezone_set('Asia/Jakarta'); // WIB (UTC+7)
+
 $isCli = (PHP_SAPI === 'cli');
 $actionBaseline = false;
 $wantJson = false;
@@ -438,7 +440,7 @@ function audit_html(array $report, $baselineMsg, $manifest, array $findings = []
     echo '</style></head><body><div class="wrap">';
 
     echo '<div class="head"><div><h1>Audit Keamanan File</h1>';
-    echo '<p>Scope: ' . $h($report['scope']) . ' &middot; Waktu: ' . $h($report['generated_at']) . '</p></div>';
+    echo '<p>Scope: ' . $h($report['scope']) . ' &middot; Waktu: ' . $h(date('d-m-Y H:i:s', strtotime($report['generated_at'])) . ' WIB') . '</p></div>';
     echo '<form method="get" style="margin:0">';
     echo '<input type="hidden" name="action" value="baseline">';
     echo $badgeBtn;
