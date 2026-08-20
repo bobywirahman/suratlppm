@@ -7,6 +7,21 @@ require_once __DIR__ . '/includes/helpers.php';
 
 session_start();
 
+// Auto-apply UNIQUE index users.nim (idempotent, best-effort, sekali per sesi) - berjalan otomatis saat deploy tanpa setup manual
+if (empty($_SESSION['_nim_idx_checked'])) {
+    try {
+        $nimIdx = $pdo->query("SELECT 1 FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'users' AND COLUMN_NAME = 'nim' LIMIT 1");
+        if (!$nimIdx->fetch()) {
+            $pdo->exec("ALTER TABLE users ADD UNIQUE KEY nim (nim)");
+        }
+        $_SESSION['_nim_idx_checked'] = true;
+    } catch (Exception $e) {
+        error_log('Migrasi UNIQUE nim gagal: ' . $e->getMessage());
+        logActivity('Migrasi', 'Gagal menambah UNIQUE nim: ' . $e->getMessage());
+        $_SESSION['_nim_idx_checked'] = true;
+    }
+}
+
 $messages = '';
 $messageType = 'success';
 if (isset($_SESSION['error'])) {
@@ -26,6 +41,19 @@ if (isset($_GET['logout'])) {
     header("Location: " . SITE_URL);
     exit;
 }
+
+// Auto-logout jika tidak ada aktivitas selama 5 menit (300 detik)
+if (isset($_SESSION['user_id']) && isset($_SESSION['last_activity'])) {
+    if (time() - $_SESSION['last_activity'] > 300) {
+        logActivity('Logout Otomatis', 'Sesi berakhir karena tidak ada aktivitas selama 5 menit');
+        session_unset();
+        session_destroy();
+        $_SESSION['error'] = 'Sesi Anda berakhir karena tidak ada aktivitas selama 5 menit. Silakan login kembali.';
+        header("Location: " . SITE_URL);
+        exit;
+    }
+}
+$_SESSION['last_activity'] = time();
 
 $userModel = new User();
 
@@ -131,18 +159,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         header("Location: " . SITE_URL . "?page=register");
         exit;
     } else {
+        $conflicts = [];
         $emailCheck = $pdo->prepare("SELECT id FROM users WHERE email = ?");
         $emailCheck->execute([$email]);
-        if ($emailCheck->fetch()) {
-            $_SESSION['error'] = 'Email anda sudah terdaftar';
-            $_SESSION['register_old'] = $_POST;
-            header("Location: " . SITE_URL . "?page=register");
-            exit;
-        }
+        if ($emailCheck->fetch()) $conflicts[] = 'Email';
+
         $usernameCheck = $pdo->prepare("SELECT id FROM users WHERE username = ?");
         $usernameCheck->execute([$username]);
-        if ($usernameCheck->fetch()) {
-            $_SESSION['error'] = 'Username sudah terdaftar';
+        if ($usernameCheck->fetch()) $conflicts[] = 'Username';
+
+        $nimCheck = $pdo->prepare("SELECT id FROM users WHERE nim = ?");
+        $nimCheck->execute([$nim]);
+        if ($nimCheck->fetch()) $conflicts[] = 'NIM';
+
+        if (!empty($conflicts)) {
+            $_SESSION['error'] = implode(', ', $conflicts) . ' sudah terdaftar';
             $_SESSION['register_old'] = $_POST;
             header("Location: " . SITE_URL . "?page=register");
             exit;
@@ -163,6 +194,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['register'])) {
         $pdo->prepare("INSERT INTO user_roles (user_id, role_id) SELECT ?, id FROM roles WHERE name = 'mahasiswa'")->execute([$newUserId]);
         logActivity('Registrasi Akun', 'Pendaftaran akun baru: ' . $username . ' (' . $full_name . ')');
         $_SESSION['pesan'] = 'Akun berhasil didaftarkan! Silakan tunggu aktivasi oleh admin.';
+        $_SESSION['registrasi_data'] = [
+            'email'    => $email,
+            'username' => $username,
+            'password' => $password,
+        ];
         header("Location: " . SITE_URL . "?page=pesan");
         exit;
     }
@@ -191,7 +227,9 @@ if (!isset($_SESSION['user_id'])) {
     if ($page === 'pesan') {
         $pesan = $_SESSION['pesan'] ?? 'Akun Anda sedang menunggu aktivasi oleh admin.';
         unset($_SESSION['pesan']);
-        includeView('auth/pesan.php', ['pesan' => $pesan]);
+        $registrasi = $_SESSION['registrasi_data'] ?? null;
+        unset($_SESSION['registrasi_data']);
+        includeView('auth/pesan.php', ['pesan' => $pesan, 'registrasi' => $registrasi]);
         exit;
     }
     includeView('auth/login.php');

@@ -20,3 +20,5 @@ uploads/syarat/syarat_1_5_6a753fdd00f7e.pdf
 database_hostinger_clean.sql
 vendor/
 composer.lock
+audit_manifest.json
+audit_security.php

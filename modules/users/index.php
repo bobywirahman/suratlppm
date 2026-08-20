@@ -194,6 +194,70 @@ ob_start();
         </div>
     </div>
 </div>
+<?php elseif ($action === 'reset-password'): ?>
+<?php
+$resetId = (int)($_GET['id'] ?? 0);
+$resetTarget = null;
+if ($resetId) {
+    $resetStmt = $pdo->prepare("SELECT u.*, r.name as role FROM users u LEFT JOIN user_roles ur ON u.id = ur.user_id LEFT JOIN roles r ON ur.role_id = r.id WHERE u.id = ?");
+    $resetStmt->execute([$resetId]);
+    $resetTarget = $resetStmt->fetch();
+}
+?>
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card">
+            <div class="card-header" style="background: linear-gradient(135deg, #FF6B35 0%, #e85d2a 100%); color: white; border-radius: 10px 10px 0 0 !important;">
+                <h5 class="mb-0"><i class="fas fa-key me-2"></i> Reset Password</h5>
+            </div>
+            <div class="card-body">
+                <?php if (!$resetTarget || $resetTarget['role'] === 'admin'): ?>
+                    <div class="alert alert-warning py-2 small"><?php echo $resetTarget ? 'Password akun admin tidak dapat direset dari menu ini.' : 'User tidak ditemukan.'; ?></div>
+                    <a href="?page=users&<?php echo $listParams; ?>" class="btn btn-outline-secondary rounded-pill px-4"><i class="fas fa-arrow-left me-1"></i> Kembali</a>
+                <?php else: ?>
+                    <div class="mb-3 p-3 rounded" style="background:#f8f9fa;">
+                        <strong><?php echo htmlspecialchars($resetTarget['full_name']); ?></strong><br>
+                        <small class="text-muted"><?php echo htmlspecialchars($resetTarget['username'] ?? '-'); ?> &middot; <?php echo htmlspecialchars($resetTarget['email']); ?></small>
+                    </div>
+                    <form method="POST" action="?page=users-save">
+                        <input type="hidden" name="reset_password" value="1">
+                        <input type="hidden" name="id" value="<?php echo $resetTarget['id']; ?>">
+                        <input type="hidden" name="back" value="<?php echo htmlspecialchars($listParams); ?>">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Password Baru *</label>
+                            <input type="password" name="new_password" id="resetPass" class="form-control" minlength="8" required placeholder="Minimal 8 karakter">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label fw-bold small text-muted">Konfirmasi Password Baru *</label>
+                            <input type="password" name="new_password_confirm" id="resetPassConfirm" class="form-control" minlength="8" required>
+                        </div>
+                        <div class="mb-4">
+                            <button type="button" class="btn btn-outline-secondary rounded-pill px-3" onclick="generatePassword()"><i class="fas fa-dice me-1"></i> Generate Acak</button>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary rounded-pill px-4"><i class="fas fa-save me-2"></i> Simpan Password</button>
+                            <a href="?page=users&<?php echo $listParams; ?>" class="btn btn-outline-secondary rounded-pill px-4">Batal</a>
+                        </div>
+                    </form>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+function generatePassword() {
+    var chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%';
+    var len = 10;
+    var pass = '';
+    var arr = new Uint32Array(len);
+    window.crypto.getRandomValues(arr);
+    for (var i = 0; i < len; i++) pass += chars[arr[i] % chars.length];
+    var p1 = document.getElementById('resetPass');
+    var p2 = document.getElementById('resetPassConfirm');
+    if (p1) p1.value = pass;
+    if (p2) p2.value = pass;
+}
+</script>
 <?php else: ?>
 <div class="card">
     <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #FF6B35 0%, #e85d2a 100%); color: white; border-radius: 10px 10px 0 0 !important;">
@@ -284,6 +348,9 @@ ob_start();
                         </td>
                         <td class="pe-3" style="white-space: nowrap;">
                             <a href="?page=users&action=edit&id=<?php echo $u['id']; ?>&<?php echo $listParams; ?>" class="btn btn-sm btn-outline-primary rounded-circle" title="Edit"><i class="fas fa-edit"></i></a>
+                            <?php if ($u['role'] !== 'admin'): ?>
+                                <a href="?page=users&action=reset-password&id=<?php echo $u['id']; ?>&<?php echo $listParams; ?>" class="btn btn-sm btn-outline-warning rounded-circle" title="Reset Password"><i class="fas fa-key"></i></a>
+                            <?php endif; ?>
                             <?php if (!$u['is_active'] && $u['role'] !== 'admin'): ?>
                                 <a href="?page=users&action=activate&id=<?php echo $u['id']; ?>&<?php echo $listParams; ?>" class="btn btn-sm btn-outline-success rounded-circle" onclick="return confirm('Aktivasi akun ini?')" title="Aktivasi"><i class="fas fa-check"></i></a>
                                 <a href="?page=users&action=reject&id=<?php echo $u['id']; ?>&<?php echo $listParams; ?>" class="btn btn-sm btn-outline-danger rounded-circle" onclick="return confirm('Tolak dan hapus akun ini?')" title="Tolak"><i class="fas fa-times"></i></a>

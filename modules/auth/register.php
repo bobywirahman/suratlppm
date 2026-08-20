@@ -26,7 +26,7 @@ $regLogo = asset(getSetting('logo', ''));
                                 <input type="text" name="full_name" class="form-control" placeholder="Nama lengkap" required value="<?php echo htmlspecialchars($old['full_name'] ?? ''); ?>">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label"><i class="fas fa-id-card me-1 text-primary"></i> NIM *</label>
+                                <label class="form-label"><i class="fas fa-id-card me-1 text-primary"></i> NIM/NIP YAYASAN *</label>
                                 <input type="text" name="nim" class="form-control" placeholder="Nomor Induk Mahasiswa" required value="<?php echo htmlspecialchars($old['nim'] ?? ''); ?>">
                             </div>
                             <div class="col-md-6">

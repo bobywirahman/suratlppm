@@ -10,6 +10,39 @@ if ($back !== '') {
     $back = preg_replace('/[^a-zA-Z0-9_%&=+ ]/', '', $back);
 }
 $redirect = '?page=users' . ($back !== '' ? '&' . $back : '');
+
+// Reset password user (halaman users-save hanya untuk admin)
+if (isset($_POST['reset_password'])) {
+    $resetId = (int)($_POST['id'] ?? 0);
+    $newPass = $_POST['new_password'] ?? '';
+    $newPassConfirm = $_POST['new_password_confirm'] ?? '';
+    $adminIds = $pdo->query("SELECT user_id FROM user_roles WHERE role_id = (SELECT id FROM roles WHERE name = 'admin')")->fetchAll(PDO::FETCH_COLUMN);
+    $resetGuard = empty($adminIds) ? '1=1' : 'id NOT IN (' . implode(',', $adminIds) . ')';
+    $target = $pdo->prepare("SELECT id, full_name, username FROM users WHERE id = ? AND $resetGuard");
+    $target->execute([$resetId]);
+    $targetUser = $target->fetch();
+    if (!$targetUser) {
+        $_SESSION['error'] = "User tidak ditemukan atau password akun admin tidak dapat direset";
+        header("Location: " . $redirect);
+        exit;
+    }
+    if (strlen($newPass) < 8) {
+        $_SESSION['error'] = "Password minimal 8 karakter";
+        header("Location: " . $redirect);
+        exit;
+    }
+    if ($newPass !== $newPassConfirm) {
+        $_SESSION['error'] = "Konfirmasi password tidak cocok";
+        header("Location: " . $redirect);
+        exit;
+    }
+    $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")->execute([password_hash($newPass, PASSWORD_DEFAULT), $resetId]);
+    logActivity('Reset Password', 'Merreset password user "' . $targetUser['full_name'] . '" (id ' . $resetId . ')');
+    $_SESSION['success'] = "Password user \"" . $targetUser['full_name'] . "\" berhasil direset. Password baru: " . $newPass;
+    header("Location: " . $redirect);
+    exit;
+}
+
 $full_name = trim($_POST['full_name'] ?? '');
 $username = trim($_POST['username'] ?? '') ?: null;
 $nip = trim($_POST['nip'] ?? '') ?: null;

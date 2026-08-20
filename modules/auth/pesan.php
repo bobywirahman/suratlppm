@@ -25,6 +25,61 @@ if ($admin_hp === '') {
                 </div>
                 <div class="card-body p-4">
                     <p class="mb-3"><?php echo htmlspecialchars($pesan ?? ''); ?></p>
+                    <?php if (!empty($registrasi)): ?>
+                    <div class="bg-light rounded-3 p-3 mb-3 text-start" style="text-align:left;">
+                        <small class="text-muted d-block mb-2 fw-bold"><i class="fas fa-save me-1"></i> Data Login Anda &mdash; simpan baik-baik:</small>
+                        <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                            <span class="small text-muted flex-shrink-0">Email</span>
+                            <span class="d-flex align-items-center gap-2">
+                                <code class="text-dark text-break"><?php echo htmlspecialchars($registrasi['email']); ?></code>
+                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-2 copy-btn" data-value="<?php echo htmlspecialchars($registrasi['email'], ENT_QUOTES); ?>" title="Salin"><i class="fas fa-copy"></i></button>
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                            <span class="small text-muted flex-shrink-0">Username</span>
+                            <span class="d-flex align-items-center gap-2">
+                                <code class="text-dark text-break"><?php echo htmlspecialchars($registrasi['username']); ?></code>
+                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-2 copy-btn" data-value="<?php echo htmlspecialchars($registrasi['username'], ENT_QUOTES); ?>" title="Salin"><i class="fas fa-copy"></i></button>
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center gap-2">
+                            <span class="small text-muted flex-shrink-0">Password</span>
+                            <span class="d-flex align-items-center gap-2">
+                                <code class="text-dark text-break"><?php echo htmlspecialchars($registrasi['password']); ?></code>
+                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-2 copy-btn" data-value="<?php echo htmlspecialchars($registrasi['password'], ENT_QUOTES); ?>" title="Salin"><i class="fas fa-copy"></i></button>
+                            </span>
+                        </div>
+                    </div>
+                    <script>
+                    (function() {
+                        var copyBtns = document.querySelectorAll('.copy-btn');
+                        function fallback(text, btn) {
+                            var ta = document.createElement('textarea');
+                            ta.value = text;
+                            ta.style.position = 'fixed';
+                            ta.style.opacity = '0';
+                            document.body.appendChild(ta);
+                            ta.select();
+                            try { document.execCommand('copy'); flash(btn); } catch (e) {}
+                            document.body.removeChild(ta);
+                        }
+                        function flash(btn) {
+                            btn.innerHTML = '<i class="fas fa-check"></i>';
+                            setTimeout(function() { btn.innerHTML = '<i class="fas fa-copy"></i>'; }, 1500);
+                        }
+                        copyBtns.forEach(function(btn) {
+                            btn.addEventListener('click', function() {
+                                var text = btn.getAttribute('data-value');
+                                if (navigator.clipboard && window.isSecureContext) {
+                                    navigator.clipboard.writeText(text).then(function() { flash(btn); }).catch(function() { fallback(text, btn); });
+                                } else {
+                                    fallback(text, btn);
+                                }
+                            });
+                        });
+                    })();
+                    </script>
+                    <?php endif; ?>
                     <div class="bg-light rounded-3 p-3 mb-3">
                         <small class="text-muted d-block mb-2">Hubungi Admin untuk Aktivasi:</small>
                         <a href="https://wa.me/62<?php echo ltrim(preg_replace('/[^0-9]/', '', $admin_hp), '0'); ?>" class="btn btn-success btn-sm rounded-pill px-3" target="_blank">

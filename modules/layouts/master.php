@@ -419,5 +419,25 @@ $hasMaster = hasPermission('manage_document_types') || hasPermission('manage_dep
     <?php endforeach; ?>
 <?php endif; ?>
 
+<?php if (isset($user)): ?>
+<script>
+(function() {
+    var IDLE_LIMIT = 5 * 60 * 1000;
+    var homeUrl = "<?php echo SITE_URL; ?>";
+    var timer = null;
+    function schedule() {
+        clearTimeout(timer);
+        timer = setTimeout(function() {
+            window.location.href = homeUrl;
+        }, IDLE_LIMIT);
+    }
+    ['click','keydown','mousemove','scroll','touchstart','pointerdown','input'].forEach(function(evt) {
+        document.addEventListener(evt, schedule, { passive: true });
+    });
+    schedule();
+})();
+</script>
+<?php endif; ?>
+
 </body>
 </html>
