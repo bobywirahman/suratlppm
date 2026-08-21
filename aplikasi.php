@@ -42,13 +42,13 @@ if (isset($_GET['logout'])) {
     exit;
 }
 
-// Auto-logout jika tidak ada aktivitas selama 5 menit (300 detik)
+// Auto-logout jika tidak ada aktivitas selama 60 menit (3600 detik)
 if (isset($_SESSION['user_id']) && isset($_SESSION['last_activity'])) {
-    if (time() - $_SESSION['last_activity'] > 300) {
-        logActivity('Logout Otomatis', 'Sesi berakhir karena tidak ada aktivitas selama 5 menit');
+    if (time() - $_SESSION['last_activity'] > 3600) {
+        logActivity('Logout Otomatis', 'Sesi berakhir karena tidak ada aktivitas selama 60 menit');
         session_unset();
         session_destroy();
-        $_SESSION['error'] = 'Sesi Anda berakhir karena tidak ada aktivitas selama 5 menit. Silakan login kembali.';
+        $_SESSION['error'] = 'Sesi Anda berakhir karena tidak ada aktivitas selama 60 menit. Silakan login kembali.';
         header("Location: " . SITE_URL);
         exit;
     }

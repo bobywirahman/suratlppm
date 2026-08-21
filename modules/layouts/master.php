@@ -422,7 +422,7 @@ $hasMaster = hasPermission('manage_document_types') || hasPermission('manage_dep
 <?php if (isset($user)): ?>
 <script>
 (function() {
-    var IDLE_LIMIT = 5 * 60 * 1000;
+    var IDLE_LIMIT = 60 * 60 * 1000;
     var homeUrl = "<?php echo SITE_URL; ?>";
     var timer = null;
     function schedule() {
